@@ -35,7 +35,7 @@ public class OrderFood implements Serializable{
 	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFood", cascade = CascadeType.ALL)
 	private OrderFoodItem orderItemFood;
-
+	
 	@ManyToOne(
 	          fetch = FetchType.LAZY,
 	          optional = false)
