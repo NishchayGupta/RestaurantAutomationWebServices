@@ -20,7 +20,7 @@ public class TableRestaurant implements Serializable{
 	private Date startDateTime;
 	private Date endDateTime;
 	private int waitingTime;
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "table", cascade = CascadeType.ALL)
+	
 	private OrderFood orderFood;
 	
 	public TableRestaurant()
@@ -68,6 +68,7 @@ public class TableRestaurant implements Serializable{
 		this.endDateTime = endDateTime;
 	}
 
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "table", cascade = CascadeType.ALL)
 	public OrderFood getOrderFood() {
 		return orderFood;
 	}

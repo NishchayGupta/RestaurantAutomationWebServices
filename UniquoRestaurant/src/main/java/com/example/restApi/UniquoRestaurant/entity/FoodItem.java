@@ -1,27 +1,23 @@
 package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToMany;
 
 
 @Entity
 public class FoodItem implements Serializable{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int foodItemId;
+	
+	private int id;
 	private String foodItemName;
 	private double foodItemPrice;
 	private String foodItemPicture;
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "foodItem", cascade = CascadeType.ALL)
-	private OrderFoodItem orderFoodItem;
+	private Set<OrderFood> orderFood;
 	
 	public FoodItem()
 	{
@@ -33,12 +29,14 @@ public class FoodItem implements Serializable{
 		this.foodItemPicture = foodItemPicture;
 	}
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int getFoodItemId() {
-		return foodItemId;
+		return id;
 	}
 
 	public void setFoodItemId(int foodItemId) {
-		this.foodItemId = foodItemId;
+		this.id = foodItemId;
 	}
 
 	public String getFoodItemName() {
@@ -65,11 +63,12 @@ public class FoodItem implements Serializable{
 		this.foodItemPicture = foodItemPicture;
 	}
 
-	public OrderFoodItem getOrderFoodItem() {
-		return orderFoodItem;
+	@ManyToMany(mappedBy = "foodItems")
+	public Set<OrderFood> getOrderFood() {
+		return orderFood;
 	}
 
-	public void setOrderFoodItem(OrderFoodItem orderFoodItem) {
-		this.orderFoodItem = orderFoodItem;
+	public void setOrderFood(Set<OrderFood> orderFood) {
+		this.orderFood = orderFood;
 	}
 }

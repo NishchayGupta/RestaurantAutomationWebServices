@@ -22,7 +22,7 @@ public class Customer implements Serializable{
     @JoinColumn(name = "person_customer")
 	@JsonIgnore
 	private Person personCustomer;
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
+	
 	private OrderFood orderFood;
 	
 	public Customer()
@@ -50,6 +50,7 @@ public class Customer implements Serializable{
 		this.personCustomer = personCustomer;
 	}
 
+	@OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
 	public OrderFood getOrderFood() {
 		return orderFood;
 	}

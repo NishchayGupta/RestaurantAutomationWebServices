@@ -115,12 +115,23 @@ public class PersonController {
 	@GetMapping("/person/login")
 	public PersonCustomer login(@RequestParam String email, @RequestParam String password)
 	{
+		Person personByEmail = personRepo.findByEmail(email);
+		if(personByEmail == null)
+		{
+			throw new UniquoNotFoundException("Email specified is not found");
+		}
+		else if(!personByEmail.getPassword().equals(password))
+		{
+			throw new UniquoNotFoundException("Password not matched");
+		}
 		Person personFetched = personRepo.findPersonByEmailAndPassword(email, password);
+		
 		logger.info("email --> {} password --> {} ", email, password);
 		if(personFetched.equals(null))
 		{
-			throw new UniquoNotFoundException("Username and password not matched");
+			throw new UniquoNotFoundException("Username and password not specified");
 		}
+		
 		PersonCustomer personCust = new PersonCustomer();
 		personCust.setStatus("OK");
 		personCust.setMessage("Login Successful");

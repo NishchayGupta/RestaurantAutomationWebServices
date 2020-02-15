@@ -13,4 +13,10 @@ public interface PersonRepository extends JpaRepository<Person, Integer>{
 	
 	@Query(value = "SELECT p from Person p where p.email=?1 and p.password=?2")
 	Person findPersonByEmailAndPassword(String email, String password);
+	
+	@Query(value = "SELECT p from Person p where p.email=?1")
+	Person findByEmail(String email);
+	
+	@Query(value = "SELECT p.email from Person p where p.email=?1")
+	String findByEmailAddress(String email);
 }

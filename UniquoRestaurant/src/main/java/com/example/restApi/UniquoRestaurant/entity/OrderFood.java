@@ -1,6 +1,7 @@
 package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -9,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
@@ -16,25 +19,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class OrderFood implements Serializable{
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int orderId;
+	
+	private int id;
 	private double totalCost;
 	private String orderType;
+	private int quantity;
 
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "orderFood_customer", nullable = false)
 	private Customer customer;
 	
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "orderFood_table", nullable = false)
 	private TableRestaurant table;
 	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
 	private Bill bill;
 	
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFood", cascade = CascadeType.ALL)
-	private OrderFoodItem orderItemFood;
+	private Set<FoodItem> foodItems;
 	
 	@ManyToOne(
 	          fetch = FetchType.LAZY,
@@ -49,18 +47,21 @@ public class OrderFood implements Serializable{
 	{
 	}
 	
-	public OrderFood(double totalCost, String orderType) {
+	public OrderFood(double totalCost, String orderType, int quantity) {
 		super();
 		this.totalCost = totalCost;
 		this.orderType = orderType;
+		this.quantity = quantity;
 	}
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int getOrderId() {
-		return orderId;
+		return id;
 	}
 
 	public void setOrderId(int orderId) {
-		this.orderId = orderId;
+		this.id = orderId;
 	}
 
 	public double getTotalCost() {
@@ -79,6 +80,8 @@ public class OrderFood implements Serializable{
 		this.orderType = orderType;
 	}
 
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "orderFood_customer", nullable = false)
 	public Customer getCustomer() {
 		return customer;
 	}
@@ -87,6 +90,8 @@ public class OrderFood implements Serializable{
 		this.customer = customer;
 	}
 
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "orderFood_table", nullable = false)
 	public TableRestaurant getTable() {
 		return table;
 	}
@@ -111,11 +116,21 @@ public class OrderFood implements Serializable{
 		this.bill = bill;
 	}
 
-	public OrderFoodItem getOrderItemFood() {
-		return orderItemFood;
+	@ManyToMany
+	@JoinTable(name="order_food_Item", joinColumns = @JoinColumn(name="orderFood_id"), inverseJoinColumns = @JoinColumn(name="foodItem_id"))
+	public Set<FoodItem> getFoodItems() {
+		return foodItems;
 	}
 
-	public void setOrderItemFood(OrderFoodItem orderItemFood) {
-		this.orderItemFood = orderItemFood;
+	public void setFoodItems(Set<FoodItem> foodItems) {
+		this.foodItems = foodItems;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 }

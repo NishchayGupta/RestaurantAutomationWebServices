@@ -21,14 +21,14 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<Object> handleAllException(Exception ex, WebRequest request) {
 		
-		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false), "Error");
 		return new ResponseEntity(exceptionRes, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 	
 	@ExceptionHandler(UniquoNotFoundException.class)
 	public final ResponseEntity<Object> handleIdNotFoundException(UniquoNotFoundException ex, WebRequest request) {
 		
-		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false), "Error");
 		return new ResponseEntity(exceptionRes, HttpStatus.NOT_FOUND);
 	}
 	
@@ -36,14 +36,14 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(
 			MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), "Validation not valid", ex.getBindingResult().toString());
+		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), "Validation not valid", ex.getBindingResult().toString(), "Error");
 		return new ResponseEntity(exceptionRes, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(EmptyListException.class)
 	public final ResponseEntity<Object> handleIdNotFoundException(EmptyListException ex, WebRequest request) {
 		
-		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		ExceptionResponse exceptionRes = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false), "Error");
 		return new ResponseEntity(exceptionRes, HttpStatus.NOT_FOUND);
 	}
 }
