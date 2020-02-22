@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 
 @Entity
 public class Person implements Serializable{
@@ -35,20 +33,12 @@ public class Person implements Serializable{
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "personCashier", cascade = CascadeType.ALL)
 	private Cashier cashier;
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "personChef", cascade = CascadeType.ALL)
-	//@JsonIgnoreProperties("personChef")
 	private Chef chef;
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "personCustomer", cascade = CascadeType.ALL)
 	private Customer customer;
 	
 	public Person() {
 	}
-	
-	/*
-	 * public Person(int personId, String name, String email, long phoneNumber,
-	 * String password, String userType) { this.personId = personId; this.name =
-	 * name; this.email = email; this.phoneNumber = phoneNumber; this.password =
-	 * password; this.userType = userType; }
-	 */
 	
 	public Person(String name, String email, long phoneNumber, String password, String userType) {
 		this.name = name;

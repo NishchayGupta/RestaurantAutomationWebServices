@@ -1,29 +1,37 @@
 package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
 public class FoodItem implements Serializable{
-	
 	private int id;
 	private String foodItemName;
 	private double foodItemPrice;
 	private String foodItemPicture;
-	private Set<OrderFood> orderFood;
+	
+	
+	private List<OrderFood> orderFood;
 	
 	public FoodItem()
 	{
 	}
 
 	public FoodItem(String foodItemName, double foodItemPrice, String foodItemPicture) {
+		super();
 		this.foodItemName = foodItemName;
 		this.foodItemPrice = foodItemPrice;
 		this.foodItemPicture = foodItemPicture;
@@ -62,13 +70,12 @@ public class FoodItem implements Serializable{
 	public void setFoodItemPicture(String foodItemPicture) {
 		this.foodItemPicture = foodItemPicture;
 	}
-
-	@ManyToMany(mappedBy = "foodItems")
-	public Set<OrderFood> getOrderFood() {
+	@ManyToMany(mappedBy = "foodItems", cascade = CascadeType.ALL)
+	public List<OrderFood> getOrderFood() {
 		return orderFood;
 	}
 
-	public void setOrderFood(Set<OrderFood> orderFood) {
+	public void setOrderFood(List<OrderFood> orderFood) {
 		this.orderFood = orderFood;
 	}
 }

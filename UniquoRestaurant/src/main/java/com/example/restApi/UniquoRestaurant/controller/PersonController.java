@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.example.restApi.UniquoRestaurant.dao.PersonCustomer;
+import com.example.restApi.UniquoRestaurant.dao.PersonUser;
 import com.example.restApi.UniquoRestaurant.entity.Person;
 import com.example.restApi.UniquoRestaurant.exception.EmptyListException;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
@@ -113,7 +113,7 @@ public class PersonController {
 	}
 	
 	@GetMapping("/person/login")
-	public PersonCustomer login(@RequestParam String email, @RequestParam String password)
+	public PersonUser login(@RequestParam String email, @RequestParam String password)
 	{
 		Person personByEmail = personRepo.findByEmail(email);
 		if(personByEmail == null)
@@ -132,11 +132,11 @@ public class PersonController {
 			throw new UniquoNotFoundException("Username and password not specified");
 		}
 		
-		PersonCustomer personCust = new PersonCustomer();
+		PersonUser personCust = new PersonUser();
 		personCust.setStatus("OK");
 		personCust.setMessage("Login Successful");
-		personCust.setTimestamp(personCust.timeStamp());
+		personCust.setTimestamp();
 		personCust.setPerson(personFetched);
 		return personCust;
-	}	
+	}
 }

@@ -9,5 +9,4 @@ public class UniquoRestaurantApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(UniquoRestaurantApplication.class, args);
 	}
-
 }

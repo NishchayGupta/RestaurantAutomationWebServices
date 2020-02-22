@@ -2,6 +2,7 @@ package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,8 +18,8 @@ public class Chef implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int chefId;
-	@OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_Chef", nullable = false)
+	@OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "person_chef")
 	@JsonIgnore
 	private Person personChef;
 	

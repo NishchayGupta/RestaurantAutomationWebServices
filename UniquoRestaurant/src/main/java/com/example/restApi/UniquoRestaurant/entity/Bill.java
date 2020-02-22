@@ -2,6 +2,7 @@ package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -18,25 +19,19 @@ public class Bill implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int billId;
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "bill_orderFood", nullable = false)
+	
 	private OrderFood orderFoodBill;
-	@ManyToOne(
-	          fetch = FetchType.LAZY,
-	          optional = false)
-	@JoinColumn(
-	          name = "cashierId",
-	          nullable = false)
-	@JsonIgnore
+	
 	private Cashier cashier;
 	
 	public Bill()
 	{
 	}
 
-	public Bill(int billId) {
+	public Bill(OrderFood orderFoodBill, Cashier cashier) {
 		super();
-		this.billId = billId;
+		this.orderFoodBill = orderFoodBill;
+		this.cashier = cashier;
 	}
 
 	public int getBillId() {
@@ -46,7 +41,9 @@ public class Bill implements Serializable{
 	public void setBillId(int billId) {
 		this.billId = billId;
 	}
-
+	@OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @JoinColumn(name = "bill_orderFood", nullable = false)
+	@JsonIgnore
 	public OrderFood getOrderFood() {
 		return orderFoodBill;
 	}
@@ -54,7 +51,13 @@ public class Bill implements Serializable{
 	public void setOrderFood(OrderFood orderFood) {
 		this.orderFoodBill = orderFood;
 	}
-
+	@ManyToOne(
+	          fetch = FetchType.LAZY,
+	          optional = false)
+	@JoinColumn(
+	          name = "cashierId",
+	          nullable = false)
+	@JsonIgnore
 	public Cashier getCashier() {
 		return cashier;
 	}

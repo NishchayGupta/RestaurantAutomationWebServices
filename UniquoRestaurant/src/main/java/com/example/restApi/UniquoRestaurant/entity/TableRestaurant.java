@@ -9,13 +9,15 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 
 @Entity
 @Table(name= "TableRestaurant")
 public class TableRestaurant implements Serializable{
 	@Id
-	private int tableId;
+	private int id;
 	private Date bookingDateTime;
 	private Date startDateTime;
 	private Date endDateTime;
@@ -28,20 +30,20 @@ public class TableRestaurant implements Serializable{
 		
 	}
 
-	public TableRestaurant(int tableId, Date bookingDateTime, Date startDateTime, Date endDateTime) {
+	public TableRestaurant(int id, Date bookingDateTime, Date startDateTime, Date endDateTime) {
 		super();
-		this.tableId = tableId;
+		this.id = id;
 		this.bookingDateTime = bookingDateTime;
 		this.startDateTime = startDateTime;
 		this.endDateTime = endDateTime;
 	}
 
-	public int getTableId() {
-		return tableId;
+	public int getId() {
+		return id;
 	}
 
-	public void setTableId(int tableId) {
-		this.tableId = tableId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public Date getBookingDateTime() {
@@ -69,6 +71,7 @@ public class TableRestaurant implements Serializable{
 	}
 
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "table", cascade = CascadeType.ALL)
+	@JsonIgnore
 	public OrderFood getOrderFood() {
 		return orderFood;
 	}

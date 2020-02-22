@@ -25,7 +25,7 @@ import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 
 /**
- * @author manojagarwal
+ * @author nishchay
  *
  */
 @RestController
@@ -63,11 +63,12 @@ public class TableController {
 	@PostMapping("/table")
 	public ResponseEntity<Object> createTable(@RequestBody TableRestaurant table)
 	{
+		TableRestaurant tableRest = new TableRestaurant(table.getId(), table.getBookingDateTime(), table.getStartDateTime(), table.getEndDateTime());
 		TableRestaurant tableSaved = tableRepo.save(table);
 		URI location = ServletUriComponentsBuilder
 		.fromCurrentRequest()
 		.path("/id")
-		.buildAndExpand(tableSaved.getTableId())
+		.buildAndExpand(tableSaved.getId())
 		.toUri();
 		
 		return ResponseEntity.created(location).build();
@@ -115,7 +116,7 @@ public class TableController {
 		{
 			throw new UniquoNotFoundException("The waiting time cannot be calculated");
 		}
-		int tableNumber = availableTime.getTableId();
+		int tableNumber = availableTime.getId();
 		logger.info("{}", tableNumber);
 		int waiting_Time = availableTime.getWaitingTime();
 		logger.info("{}", waiting_Time);

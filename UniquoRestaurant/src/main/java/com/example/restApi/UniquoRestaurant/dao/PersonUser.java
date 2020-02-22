@@ -1,25 +1,27 @@
 package com.example.restApi.UniquoRestaurant.dao;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import com.example.restApi.UniquoRestaurant.entity.Person;
 
-public class PersonCustomer {
+public class PersonUser implements Serializable{
 	
 	private String status;
 	private String timestamp;
 	private String message;
 	private Person person;
 	
-	public PersonCustomer()
+	public PersonUser()
 	{
 		
 	}
 	
-	public PersonCustomer(String status, String message, Person person) {
+	public PersonUser(String status, String message, Person person) {
 		super();
 		this.status = status;
 		this.message = message;
+		this.timestamp = timeStamp();
 		this.person = person;
 	}
 
@@ -35,8 +37,8 @@ public class PersonCustomer {
 		return timestamp;
 	}
 
-	public void setTimestamp(String timestamp) {
-		this.timestamp = timestamp;
+	public void setTimestamp() {
+		this.timestamp = timeStamp();
 	}
 
 	public String getMessage() {
