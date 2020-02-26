@@ -1,18 +1,16 @@
 package com.example.restApi.UniquoRestaurant.entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.validation.constraints.Null;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,8 +24,10 @@ public class Customer implements Serializable{
     @JoinColumn(name = "person_customer")
 	@JsonIgnore
 	private Person personCustomer;
-	
-	private OrderFood orderFood;
+	private String orderType;
+	@OneToMany(mappedBy = "customer", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private List<OrderFood> orderFood;
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "table_customer", unique = false)
 	@JsonIgnore
@@ -37,10 +37,11 @@ public class Customer implements Serializable{
 	{
 	}
 
-	public Customer(Person personCustomer, TableRestaurant tablesRestaurant) {
+	public Customer(Person personCustomer, TableRestaurant tablesRestaurant, String orderType) {
 		super();
 		this.personCustomer = personCustomer;
 		this.tablesRestaurant = tablesRestaurant;
+		this.orderType = orderType;
 	}
 
 	public int getCustomerId() {
@@ -59,13 +60,19 @@ public class Customer implements Serializable{
 		this.personCustomer = personCustomer;
 	}
 
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "customer", cascade = CascadeType.ALL)
-	@JsonIgnore
-	public OrderFood getOrderFood() {
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
+
+	public List<OrderFood> getOrderFood() {
 		return orderFood;
 	}
 
-	public void setOrderFood(OrderFood orderFood) {
+	public void setOrderFood(List<OrderFood> orderFood) {
 		this.orderFood = orderFood;
 	}
 

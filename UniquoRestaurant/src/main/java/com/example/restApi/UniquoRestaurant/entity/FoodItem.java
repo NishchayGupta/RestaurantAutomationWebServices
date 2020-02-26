@@ -5,26 +5,22 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
 public class FoodItem implements Serializable{
+	
 	private int id;
 	private String foodItemName;
 	private double foodItemPrice;
 	private String foodItemPicture;
 	
-	
-	private List<OrderFood> orderFood;
+    private List<FoodItemOrder> foodItemOrders;
 	
 	public FoodItem()
 	{
@@ -39,12 +35,12 @@ public class FoodItem implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public int getFoodItemId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setFoodItemId(int foodItemId) {
-		this.id = foodItemId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getFoodItemName() {
@@ -70,12 +66,13 @@ public class FoodItem implements Serializable{
 	public void setFoodItemPicture(String foodItemPicture) {
 		this.foodItemPicture = foodItemPicture;
 	}
-	@ManyToMany(mappedBy = "foodItems", cascade = CascadeType.ALL)
-	public List<OrderFood> getOrderFood() {
-		return orderFood;
+
+	@OneToMany(mappedBy = "foodItem", cascade = CascadeType.ALL)
+	public List<FoodItemOrder> getFoodItemOrders() {
+		return foodItemOrders;
 	}
 
-	public void setOrderFood(List<OrderFood> orderFood) {
-		this.orderFood = orderFood;
+	public void setFoodItemOrders(List<FoodItemOrder> foodItemOrders) {
+		this.foodItemOrders = foodItemOrders;
 	}
 }

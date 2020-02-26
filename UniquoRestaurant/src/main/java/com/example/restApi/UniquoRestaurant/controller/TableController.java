@@ -1,12 +1,18 @@
 package com.example.restApi.UniquoRestaurant.controller;
 
 import java.net.URI;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+
+import java.text.ParseException;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.example.restApi.UniquoRestaurant.dao.WaitingTime;
 import com.example.restApi.UniquoRestaurant.entity.TableRestaurant;
 import com.example.restApi.UniquoRestaurant.exception.EmptyListException;
+import com.example.restApi.UniquoRestaurant.exception.ExceptionResponse;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 
@@ -104,24 +111,83 @@ public class TableController {
 	}
 	
 	/* 
+	 * Method - updateWaitingTime 
+	 * Update the waiting time in the database 
+	 * */
+	
+	@GetMapping("/table/updateWaitingTime")
+	public ResponseEntity<Object> updateWaitingTime() throws ParseException
+	{
+		List<TableRestaurant> allTablesUpdate = tableRepo.findAll();
+		for (TableRestaurant tableReceived : allTablesUpdate) {
+			logger.info("tableIdOutdsideIf: {}", tableReceived.getId());
+			if(tableReceived.getId() == 11 || tableReceived.getId() == 12)
+			{
+				continue;
+			}
+			else
+			{
+				logger.info("tableIdInsideElse: {}", tableReceived.getId());
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				String endDate = sdf.format(tableReceived.getEndDateTime());
+				Date todayDate = new Date();
+				try {
+					Date endDateTime = sdf.parse(endDate);
+	
+					if (endDateTime.compareTo(todayDate) < 0) { // if end date time is less than
+						logger.info("Inside date less than condition: {}", tableReceived.getId());
+						tableRepo.setCurrentDateTime(tableReceived.getId());
+					} else if (endDateTime.compareTo(todayDate) == 0) { // both date are same
+						logger.info("Inside both date same condition: {}", tableReceived.getId());
+						if (endDateTime.getTime() == todayDate.getTime() || endDateTime.getTime() < todayDate.getTime()) { // expired
+							tableRepo.setCurrentDateTime(tableReceived.getId());
+						}
+					} else {
+						continue;
+					}
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				tableRepo.save(tableReceived);
+			}
+		}
+		int updateWaitingTime = tableRepo.updateWaitingTime();
+		logger.info("updateWaitingTime: {}", updateWaitingTime);
+		if(!(updateWaitingTime >= 0))
+		{
+			throw new UniquoNotFoundException("Update unsuccessful: " + updateWaitingTime);
+		}
+		else
+		{
+			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Update Successful", "", "OK"));
+		}
+	}	
+	
+	/* 
 	 * Method - getAvailability() 
 	 * To return the least waiting time in the restaurant for a table 
 	 * */
 	
 	@GetMapping("/table/checkAvailability")
-	public WaitingTime getAvailability()
+	public WaitingTime getAvailability() throws ParseException
 	{
-		TableRestaurant availableTime = tableRepo.checkTableAvailability();
-		if(availableTime.equals(null))
-		{
-			throw new UniquoNotFoundException("The waiting time cannot be calculated");
-		}
-		int tableNumber = availableTime.getId();
-		logger.info("{}", tableNumber);
-		int waiting_Time = availableTime.getWaitingTime();
-		logger.info("{}", waiting_Time);
-		WaitingTime waitingTime = new WaitingTime(tableNumber, waiting_Time);
-		return waitingTime;
+
+			//tableRepo.save(tableRepo.checkTableAvailability());
+			TableRestaurant availableTime = tableRepo.checkTableAvailability();
+			
+			logger.info("waiting time ---> {}", availableTime.getWaitingTime());
+			//tableRepo.save(availableTime);
+			if(availableTime.equals(null))
+			{
+				throw new UniquoNotFoundException("The waiting time cannot be calculated");
+			}
+			int tableNumber = availableTime.getId();
+			logger.info("{}", tableNumber);
+			int waiting_Time = availableTime.getWaitingTime();
+			logger.info("{}", waiting_Time);
+			WaitingTime waitingTime = new WaitingTime(tableNumber, waiting_Time);
+			
+			return waitingTime;
 	}
 	
 	/* 

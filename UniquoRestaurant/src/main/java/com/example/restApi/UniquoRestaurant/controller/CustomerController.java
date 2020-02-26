@@ -50,7 +50,7 @@ public class CustomerController {
 	public PersonUser addCustomer(@RequestBody Person person)
 	{
 		Optional<TableRestaurant> tableRest = tableRepo.findById(12);
-		Customer customer = new Customer(person, tableRest.get());
+		Customer customer = new Customer(person, tableRest.get(), "Takeout");
 		person.setCustomer(customer);
 		Customer cust = customerRepo.save(customer);
 		logger.info("custid: {},  orderFood: {}, personId: {}, tableId: {}", cust.getCustomerId(), cust.getOrderFood(), cust.getPersonCustomer(), cust.getTablesRestaurant());
@@ -120,6 +120,7 @@ public class CustomerController {
 		if(!updateCustomer.equals(null))
 		{
 			updateCustomer.setTablesRestaurant(tableResto.get());
+			updateCustomer.setOrderType("Dine In");
 			customerRepo.save(updateCustomer);
 			table.setBookingDateTime(new Timestamp(System.currentTimeMillis()));
 			tableRepo.save(table);

@@ -1,54 +1,49 @@
 package com.example.restApi.UniquoRestaurant.dao;
 
-import java.sql.Timestamp;
 import java.util.List;
-import com.example.restApi.UniquoRestaurant.entity.FoodItem;
-import com.example.restApi.UniquoRestaurant.entity.Person;
 
 public class CustomerOrder {
-	private Person person;
-	private List<FoodItem> itemFood;
-	private List<Integer> foodQuantity;
+	private int customerId;
+	private int tableId;
+	private List<CustomerOrderCart> orderCart;
 	
-	public CustomerOrder() {
+	public CustomerOrder()
+	{
 	}
 
-	public CustomerOrder(Person person, List<FoodItem> itemFood,
-			List<Integer> foodQuantity) {
+	public CustomerOrder(int customerId, int tableId, List<CustomerOrderCart> orderCart) {
 		super();
-		this.person = person;
-		this.itemFood = itemFood;
-		this.foodQuantity = foodQuantity;
+		this.customerId = customerId;
+		this.tableId = tableId;
+		this.orderCart = orderCart;
 	}
 
-	public Person getPerson() {
-		return person;
+	public int getCustomerId() {
+		return customerId;
 	}
 
-	public void setPerson(Person person) {
-		this.person = person;
+	public void setCustomerId(int customerId) {
+		this.customerId = customerId;
 	}
 
-	public List<FoodItem> getItemFood() {
-		return itemFood;
+	public int getTableId() {
+		return tableId;
 	}
 
-	public void setItemFood(List<FoodItem> itemFood) {
-		this.itemFood = itemFood;
-	}
-	
-	public List<Integer> getFoodQuantity() {
-		return foodQuantity;
+	public void setTableId(int tableId) {
+		this.tableId = tableId;
 	}
 
-	public void setFoodQuantity(List<Integer> foodQuantity) {
-		this.foodQuantity = foodQuantity;
+	public List<CustomerOrderCart> getOrderCart() {
+		return orderCart;
 	}
 
-	public String timeStamp()
-    {
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        String tm = "" + ts.getTime();
-        return tm;
-    }
+	public void setOrderCart(List<CustomerOrderCart> orderCart) {
+		this.orderCart = orderCart;
+	}
+
+	@Override
+	public String toString() {
+		return "CustomerOrder [customerId=" + customerId + ", tableId=" + tableId + ", orderCart=" + orderCart + "]";
+	}
 }

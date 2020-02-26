@@ -19,7 +19,7 @@ public class Cashier implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int cashierId;
 	@OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "person_cashier", nullable = false)
+    @JoinColumn(name = "person_cashier")
 	@JsonIgnore
 	private Person personCashier;
 	

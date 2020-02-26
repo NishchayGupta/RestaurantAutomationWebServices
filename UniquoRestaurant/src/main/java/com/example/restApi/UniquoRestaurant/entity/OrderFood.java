@@ -10,9 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,25 +19,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class OrderFood implements Serializable{
 	
+	
 	private int id;
+	
 	private double totalCost;
-	private String orderType;
-
-	private Customer customer;
-	private List<Integer> quantity;
+	
+    private Customer customerOrder;
+	
 	private TableRestaurant table;
 	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
 	private Bill bill;
 	
-	private List<FoodItem> foodItems;
+	private List<FoodItemOrder> foodItemOrder;
 	
 	@ManyToOne(
 	          fetch = FetchType.LAZY,
 	          optional = false)
-	@JoinColumn(
-	          name = "orderFood_chef",
-	          nullable = false)
+	@JoinColumn
 	@JsonIgnore
 	private Chef chef;
 	
@@ -46,28 +44,28 @@ public class OrderFood implements Serializable{
 	{
 	}
 	
-	public OrderFood(double totalCost, String orderType, Customer customer, TableRestaurant table, Bill bill,
-			List<FoodItem> foodItems, Chef chef) {
+	public OrderFood(double totalCost, Customer customerOrder, TableRestaurant table,
+			Chef chef, List<FoodItemOrder> foodItemOrder) {
 		super();
 		this.totalCost = totalCost;
-		this.orderType = orderType;
-		this.customer = customer;
+		this.customerOrder = customerOrder;
 		this.table = table;
-		this.bill = bill;
-		this.foodItems = foodItems;
+		this.foodItemOrder = foodItemOrder;
 		this.chef = chef;
 	}
 
+
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public int getOrderId() {
+	public int getId() {
 		return id;
 	}
 
-	public void setOrderId(int orderId) {
-		this.id = orderId;
+	public void setId(int id) {
+		this.id = id;
 	}
-
+	
 	public double getTotalCost() {
 		return totalCost;
 	}
@@ -76,27 +74,18 @@ public class OrderFood implements Serializable{
 		this.totalCost = totalCost;
 	}
 
-	public String getOrderType() {
-		return orderType;
-	}
-
-	public void setOrderType(String orderType) {
-		this.orderType = orderType;
-	}
-
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "orderFood_customer", nullable = false)
-	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn
 	public Customer getCustomer() {
-		return customer;
+		return customerOrder;
 	}
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
+	public void setCustomer(Customer customerOrder) {
+		this.customerOrder = customerOrder;
 	}
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "orderFood_table", nullable = false)
+    @JoinColumn(name = "orderFood_table")
 	@JsonIgnore
 	public TableRestaurant getTable() {
 		return table;
@@ -121,14 +110,13 @@ public class OrderFood implements Serializable{
 	public void setBill(Bill bill) {
 		this.bill = bill;
 	}
-	
-	@ManyToMany(targetEntity = FoodItem.class)
-	@JoinTable(name="order_food_Item", joinColumns = @JoinColumn(name="orderFood_id"), inverseJoinColumns = @JoinColumn(name="foodItem_id"))
-	public List<FoodItem> getFoodItems() {
-		return foodItems;
+
+	@OneToMany(mappedBy = "orderFood", cascade = CascadeType.ALL)
+	public List<FoodItemOrder> getFoodItemOrder() {
+		return foodItemOrder;
 	}
 
-	public void setFoodItems(List<FoodItem> foodItems) {
-		this.foodItems = foodItems;
+	public void setFoodItemOrder(List<FoodItemOrder> foodItemOrder) {
+		this.foodItemOrder = foodItemOrder;
 	}
 }

@@ -56,7 +56,7 @@ public class FoodItemController {
 		URI location = ServletUriComponentsBuilder
 		.fromCurrentRequest()
 		.path("/id")
-		.buildAndExpand(foodItemSaved.getFoodItemId())
+		.buildAndExpand(foodItemSaved.getId())
 		.toUri();
 		
 		return ResponseEntity.created(location).build();

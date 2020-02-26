@@ -42,7 +42,7 @@ public class Bill implements Serializable{
 		this.billId = billId;
 	}
 	@OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "bill_orderFood", nullable = false)
+    @JoinColumn(name = "bill")
 	@JsonIgnore
 	public OrderFood getOrderFood() {
 		return orderFoodBill;
@@ -55,8 +55,7 @@ public class Bill implements Serializable{
 	          fetch = FetchType.LAZY,
 	          optional = false)
 	@JoinColumn(
-	          name = "cashierId",
-	          nullable = false)
+	          name = "cashierId")
 	@JsonIgnore
 	public Cashier getCashier() {
 		return cashier;

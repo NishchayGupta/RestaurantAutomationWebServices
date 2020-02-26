@@ -2,6 +2,7 @@ package com.example.restApi.UniquoRestaurant.controller;
 
 import java.net.URI;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -19,13 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.restApi.UniquoRestaurant.dao.CustomerOrder;
+import com.example.restApi.UniquoRestaurant.dao.CustomerOrderCart;
 import com.example.restApi.UniquoRestaurant.entity.Bill;
 import com.example.restApi.UniquoRestaurant.entity.Cashier;
 import com.example.restApi.UniquoRestaurant.entity.Chef;
 import com.example.restApi.UniquoRestaurant.entity.Customer;
 import com.example.restApi.UniquoRestaurant.entity.FoodItem;
+import com.example.restApi.UniquoRestaurant.entity.FoodItemOrder;
 import com.example.restApi.UniquoRestaurant.entity.OrderFood;
-import com.example.restApi.UniquoRestaurant.entity.Person;
 import com.example.restApi.UniquoRestaurant.entity.TableRestaurant;
 import com.example.restApi.UniquoRestaurant.exception.EmptyListException;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
@@ -40,7 +42,7 @@ import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 @RestController
 @RequestMapping("/uniquo")
 public class OrderFoodController {
-	static double total_cost = 0;
+	
 	@Autowired
 	private OrderFoodRepository orderFoodRepo;
 	
@@ -61,6 +63,7 @@ public class OrderFoodController {
 	
 	@Autowired
 	private BillRepository billRepo;
+	
 	
 	Logger logger = LoggerFactory.getLogger(OrderFoodController.class);
 	
@@ -94,7 +97,7 @@ public class OrderFoodController {
 		URI location = ServletUriComponentsBuilder
 		.fromCurrentRequest()
 		.path("/id")
-		.buildAndExpand(orderFoodSaved.getOrderId())
+		.buildAndExpand(orderFoodSaved.getId())
 		.toUri();
 		
 		return ResponseEntity.created(location).build();
@@ -118,7 +121,7 @@ public class OrderFoodController {
 		OrderFood updateOrderFood = orderFoodFetched.get();
 		if(orderFoodFetched.isPresent())
 		{
-			updateOrderFood.setOrderType(orderFood.getOrderType());
+			//updateOrderFood.setOrderType(orderFood.getOrderType());
 			updateOrderFood.setTotalCost(orderFood.getTotalCost());
 			orderFoodRepo.save(updateOrderFood);
 		}
@@ -128,78 +131,92 @@ public class OrderFoodController {
 		return updateOrderFood;
 	}
 	
-	@PostMapping("/orderFood/{tableId}")
-	public OrderFood orderFoodCust(@PathVariable int tableId, @RequestBody CustomerOrder custOrd)
+	@PostMapping("/orderFood")
+	public OrderFood orderFoodCust(@RequestBody CustomerOrder custOrd)
 	{
-		OrderFood order_food = new OrderFood();
-		
+		OrderFood order_food = null;
+		List<FoodItemOrder> foodItemOrders;
 		// Customer to be fetched and set
-		Person personFetched = custOrd.getPerson();
-		logger.info("personId: {},person email: {}", personFetched.getPersonId(), personFetched.getEmail());
-		Customer customerFetched = customerRepo.findByEmailAddress(personFetched.getEmail());
-		logger.info("person_PersonId: {}, customerPersonId: {}, customerId: {}", personFetched.getPersonId(), 
-				customerFetched.getPersonCustomer().getPersonId(), customerFetched.getCustomerId());
-		order_food.setCustomer(customerFetched);
+		Optional<Customer> customerRetrieved = customerRepo.findById(custOrd.getCustomerId());
+		Customer customerFetched = customerRetrieved.get();
+		logger.info("customerId: {}, customerIdRequest: {}", customerFetched.getCustomerId(), custOrd.getCustomerId());
+		//order_food.setCustomer(customerFetched);
 		
 		// Table to be fetched and set
-		Optional<TableRestaurant> table = tableRepo.findById(tableId);
+		Optional<TableRestaurant> table = tableRepo.findById(custOrd.getTableId());
 		TableRestaurant tableFetched = table.get();
 		if(!table.isPresent())
 		{
-			throw new UniquoNotFoundException("id: " + tableId);
+			throw new UniquoNotFoundException("id: " + custOrd.getTableId());
 		}
-		order_food.setTable(tableFetched);
+		//order_food.setTable(tableFetched);
 		
 		// Chef to be fetched and set
 		List<Chef> chefList = chefRepo.findAll();
 		Chef chefFetched = null;
 		for(int i = 0; i< chefList.size(); i++)
 		{
-			if(chefList.get(i) != null)
+			if(chefList.get(i) == null)
+			{
+				throw new UniquoNotFoundException("No chef registered yet");
+			}
+			else if(chefList.get(i) != null)
 			{
 				chefFetched = chefList.get(i);
 				logger.info("chefId: {}, personName: {}", chefFetched.getChefId(), chefFetched.getPersonChef().getName());
-				order_food.setChef(chefFetched);
 				break;
 			}
+			else
+				continue;
 		}
-		
-		/*
-		// FoodItems to be fetched and set in OrderFood
-		List<FoodItem> foodItemsList = custOrd.getItemFood();
-		order_food.setFoodItems(foodItemsList); */
-		
-		// set quantity in foodQuantity and calculate the total cost
-//		List<Integer> foodQty = custOrd.getFoodQuantity();
-//		FoodItem foodItemRetrieved = null;
-//		FoodQuantity foodQuantity = null;
-//		
-//		for(int m=0; m<custOrd.getItemFood().size(); m++)
-//		{
-//			for(int n=m; n<=m; n++)
-//			{
-//				foodItemRetrieved = custOrd.getItemFood().get(m);
-//				foodQuantity = new FoodQuantity(foodQty.get(n), foodItemRetrieved);
-//				total_cost += foodItemRetrieved.getFoodItemPrice() * foodQty.get(n);
-//				//foodItemRetrieved.setFoodQuantity(foodQuantity);
-//				//foodItemRepo.save(foodItemRetrieved);
-//			}
-//		}
-//		order_food.setTotalCost(total_cost);
 		
 		// set OrderType
-		if(tableId == 11)
+				if(custOrd.getTableId() == 11)
+					customerFetched.setOrderType("Takeout");
+				else if(custOrd.getTableId() == 12)
+					customerFetched.setOrderType("xyz");
+				else
+					customerFetched.setOrderType("Dine In");
+		
+		/*
+		 FoodItems to be fetched and set in OrderFood
+		 set quantity in foodQuantity and calculate the total cost
+		 */
+		List<CustomerOrderCart> cartItems = custOrd.getOrderCart();
+		double total_cost = 0;
+		Optional<FoodItem> foodItemRetrieved = null;
+		CustomerOrderCart cart = null;
+		foodItemOrders = new ArrayList<>();
+		FoodItem foodItemFetched = null;
+		order_food.setId(1);
+		for(int m=0; m<cartItems.size(); m++)
 		{
-			order_food.setOrderType("Takeout");
+			System.out.println("Cart Size: " + cartItems.size());
+			cart = cartItems.get(m);
+			logger.info("foodItemId: {}", cart.getFoodItemId());
+			foodItemRetrieved = foodItemRepo.findById(cart.getFoodItemId());
+			foodItemFetched = foodItemRetrieved.get();
+			logger.info("foodItemName: {}", foodItemFetched.getFoodItemName());
+			//order_food = new OrderFood(0, customerFetched, tableFetched, null, chefFetched, new FoodItemOrder(foodItemFetched, cart.getQuantity()));
+			FoodItemOrder food_item_order = new FoodItemOrder(foodItemFetched, cart.getQuantity());
+			//food_item_order.setOrderFood(order_food);
+			
+			foodItemOrders.add(food_item_order);
+			for(FoodItemOrder fio: foodItemOrders)
+			{
+				System.out.println(fio.getFoodItem().getFoodItemName());
+				System.out.println(fio.getQuantity());
+			}
+			
+			total_cost += foodItemOrders.get(m).getFoodItem().getFoodItemPrice() * cart.getQuantity();
+			logger.info("total_cost: {}", total_cost);
 		}
-		else
-			order_food.setOrderType("Dine In");
-		
-		
-		
+
 		// Finally save the OrderFood object
-		OrderFood orderFoodCreated = orderFoodRepo.save(order_food);
 		
+		order_food = new OrderFood(total_cost, customerFetched, tableFetched, chefFetched, foodItemOrders);
+		for(FoodItemOrder fio: foodItemOrders)
+			fio.setOrderFood(order_food);
 		// Set the bill
 		List<Cashier> cashierList = cashierRepo.findAll();
 		Cashier cashierFetched = null;
@@ -213,15 +230,19 @@ public class OrderFoodController {
 		}
 		Bill bill = new Bill(order_food, cashierFetched);
 		Bill billSaved = billRepo.save(bill);
+		order_food.setBill(billSaved);
 		if(billSaved.equals(null))
 		{
 			throw new UniquoNotFoundException("Error in creating the bill");
 		}
+	
 		
+		OrderFood orderFoodCreated = orderFoodRepo.save(order_food);
 		if(orderFoodCreated.equals(null))
 		{
 			throw new UniquoNotFoundException("Error in creating order");
 		}
-		return order_food;
+		Optional<OrderFood> retrieveOrderFood = orderFoodRepo.findById(orderFoodCreated.getId()); 
+		return retrieveOrderFood.get();
 	}
 }
