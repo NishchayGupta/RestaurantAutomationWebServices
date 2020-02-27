@@ -130,4 +130,17 @@ public class CustomerController {
 		
 		return updateCustomer;
 	}
+	
+	@PutMapping("/customer/takeOut/{customerId}")
+	public PersonUser takeOutCustomer(@PathVariable int customerId)
+	{
+		Customer custFetched = customerRepo.updateById(customerId);
+		Optional<Person> personFetched = personRepo.findById(custFetched.getPersonCustomer().getPersonId());
+		PersonUser personCust = new PersonUser();
+		personCust.setStatus("OK");
+		personCust.setMessage("Table number for take-out customer is updated");
+		personCust.setTimestamp();
+		personCust.setPerson(personFetched.get());
+		return personCust;
+	}
 }

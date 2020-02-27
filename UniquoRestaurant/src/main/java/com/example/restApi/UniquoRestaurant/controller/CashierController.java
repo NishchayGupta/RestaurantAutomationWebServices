@@ -37,7 +37,7 @@ public class CashierController {
 		Cashier cashier = new Cashier(person);
 		person.setCashier(cashier);
 		Cashier cashierSaved = cashierRepo.save(cashier);
-		logger.info("CashierId: {}, PersonId: {}, Person Name: {}", cashierSaved.getCashierId(), 
+		logger.info("CashierId: {}, PersonId: {}, Person Name: {}", cashierSaved.getId(), 
 				cashierSaved.getPersonCashier().getPersonId(), cashierSaved.getPersonCashier().getName());
 		Optional<Person> person_Cashier = personRepo.findById(cashierSaved.getPersonCashier().getPersonId());
 		Person personNew = person_Cashier.get();

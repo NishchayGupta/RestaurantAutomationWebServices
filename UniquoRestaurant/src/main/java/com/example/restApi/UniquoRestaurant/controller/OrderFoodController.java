@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,8 @@ import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 @RestController
 @RequestMapping("/uniquo")
 public class OrderFoodController {
+	
+	public static final int ID_LENGTH = 10;
 	
 	@Autowired
 	private OrderFoodRepository orderFoodRepo;
@@ -134,13 +137,14 @@ public class OrderFoodController {
 	@PostMapping("/orderFood")
 	public OrderFood orderFoodCust(@RequestBody CustomerOrder custOrd)
 	{
+		int uniqueOrderId = Integer.parseInt(RandomStringUtils.randomNumeric(ID_LENGTH));
 		OrderFood order_food = null;
 		List<FoodItemOrder> foodItemOrders;
+		
 		// Customer to be fetched and set
 		Optional<Customer> customerRetrieved = customerRepo.findById(custOrd.getCustomerId());
 		Customer customerFetched = customerRetrieved.get();
 		logger.info("customerId: {}, customerIdRequest: {}", customerFetched.getCustomerId(), custOrd.getCustomerId());
-		//order_food.setCustomer(customerFetched);
 		
 		// Table to be fetched and set
 		Optional<TableRestaurant> table = tableRepo.findById(custOrd.getTableId());
@@ -149,7 +153,6 @@ public class OrderFoodController {
 		{
 			throw new UniquoNotFoundException("id: " + custOrd.getTableId());
 		}
-		//order_food.setTable(tableFetched);
 		
 		// Chef to be fetched and set
 		List<Chef> chefList = chefRepo.findAll();
@@ -188,7 +191,7 @@ public class OrderFoodController {
 		CustomerOrderCart cart = null;
 		foodItemOrders = new ArrayList<>();
 		FoodItem foodItemFetched = null;
-		order_food.setId(1);
+		
 		for(int m=0; m<cartItems.size(); m++)
 		{
 			System.out.println("Cart Size: " + cartItems.size());
@@ -197,9 +200,7 @@ public class OrderFoodController {
 			foodItemRetrieved = foodItemRepo.findById(cart.getFoodItemId());
 			foodItemFetched = foodItemRetrieved.get();
 			logger.info("foodItemName: {}", foodItemFetched.getFoodItemName());
-			//order_food = new OrderFood(0, customerFetched, tableFetched, null, chefFetched, new FoodItemOrder(foodItemFetched, cart.getQuantity()));
 			FoodItemOrder food_item_order = new FoodItemOrder(foodItemFetched, cart.getQuantity());
-			//food_item_order.setOrderFood(order_food);
 			
 			foodItemOrders.add(food_item_order);
 			for(FoodItemOrder fio: foodItemOrders)
@@ -213,10 +214,11 @@ public class OrderFoodController {
 		}
 
 		// Finally save the OrderFood object
-		
 		order_food = new OrderFood(total_cost, customerFetched, tableFetched, chefFetched, foodItemOrders);
+		order_food.setId(uniqueOrderId);
 		for(FoodItemOrder fio: foodItemOrders)
 			fio.setOrderFood(order_food);
+		
 		// Set the bill
 		List<Cashier> cashierList = cashierRepo.findAll();
 		Cashier cashierFetched = null;
@@ -228,16 +230,16 @@ public class OrderFoodController {
 				break;
 			}
 		}
-		Bill bill = new Bill(order_food, cashierFetched);
+		Bill bill = new Bill();
+		bill.setCashier(cashierFetched);
+		
+		OrderFood orderFoodCreated = orderFoodRepo.save(order_food);
+		bill.setOrderFoodBill(orderFoodCreated);
 		Bill billSaved = billRepo.save(bill);
-		order_food.setBill(billSaved);
 		if(billSaved.equals(null))
 		{
 			throw new UniquoNotFoundException("Error in creating the bill");
 		}
-	
-		
-		OrderFood orderFoodCreated = orderFoodRepo.save(order_food);
 		if(orderFoodCreated.equals(null))
 		{
 			throw new UniquoNotFoundException("Error in creating order");

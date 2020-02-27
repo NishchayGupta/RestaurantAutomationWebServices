@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 @Entity
@@ -68,6 +70,7 @@ public class FoodItem implements Serializable{
 	}
 
 	@OneToMany(mappedBy = "foodItem", cascade = CascadeType.ALL)
+	@JsonIgnore
 	public List<FoodItemOrder> getFoodItemOrders() {
 		return foodItemOrders;
 	}

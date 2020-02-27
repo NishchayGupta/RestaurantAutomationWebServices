@@ -31,13 +31,11 @@ public class OrderFood implements Serializable{
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
 	private Bill bill;
 	
+	//@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
+	//private Bill bill;
+	
 	private List<FoodItemOrder> foodItemOrder;
 	
-	@ManyToOne(
-	          fetch = FetchType.LAZY,
-	          optional = false)
-	@JoinColumn
-	@JsonIgnore
 	private Chef chef;
 	
 	public OrderFood()
@@ -53,8 +51,6 @@ public class OrderFood implements Serializable{
 		this.foodItemOrder = foodItemOrder;
 		this.chef = chef;
 	}
-
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -76,6 +72,7 @@ public class OrderFood implements Serializable{
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn
+    @JsonIgnore
 	public Customer getCustomer() {
 		return customerOrder;
 	}
@@ -95,6 +92,11 @@ public class OrderFood implements Serializable{
 		this.table = table;
 	}
 
+	@ManyToOne(
+	          fetch = FetchType.LAZY,
+	          optional = false)
+	@JoinColumn
+	@JsonIgnore
 	public Chef getChef() {
 		return chef;
 	}
@@ -102,16 +104,9 @@ public class OrderFood implements Serializable{
 	public void setChef(Chef chef) {
 		this.chef = chef;
 	}
-	
-	public Bill getBill() {
-		return bill;
-	}
-
-	public void setBill(Bill bill) {
-		this.bill = bill;
-	}
 
 	@OneToMany(mappedBy = "orderFood", cascade = CascadeType.ALL)
+	@JsonIgnore
 	public List<FoodItemOrder> getFoodItemOrder() {
 		return foodItemOrder;
 	}
