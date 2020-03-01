@@ -42,4 +42,11 @@ public interface TableRepository extends JpaRepository<TableRestaurant, Integer>
 	@Modifying
 	@Query(value = "UPDATE table_restaurant SET start_date_time = now(), end_date_time = now() WHERE id=?1 ", nativeQuery = true)
 	void setCurrentDateTime(int tableId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update table_restaurant \n" + 
+			"            SET start_date_time = NOW(), end_date_time = DATE_ADD(NOW(), INTERVAL 1 HOUR)\n" + 
+			"            where id = ?1", nativeQuery = true)
+	void setDateTimeOrderPrepared(int tableId);
 }

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.restApi.UniquoRestaurant.dao.PersonUser;
 import com.example.restApi.UniquoRestaurant.entity.Customer;
+import com.example.restApi.UniquoRestaurant.entity.OrderFood;
 import com.example.restApi.UniquoRestaurant.entity.Person;
 import com.example.restApi.UniquoRestaurant.entity.TableRestaurant;
+import com.example.restApi.UniquoRestaurant.exception.ExceptionResponse;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.CustomerRepository;
+import com.example.restApi.UniquoRestaurant.repository.OrderFoodRepository;
 import com.example.restApi.UniquoRestaurant.repository.PersonRepository;
 import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 
@@ -43,6 +48,9 @@ public class CustomerController {
 	
 	@Autowired
 	private TableRepository tableRepo;
+	
+	@Autowired
+	private OrderFoodRepository orderFoodRepo;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -68,8 +76,19 @@ public class CustomerController {
 		personCust.setMessage("Registration OK");
 		personCust.setTimestamp();
 		personCust.setPerson(personNew);
-		
+		logger.info("Registration successful");
 		return personCust;
+	}
+	
+	@GetMapping("/customer/emailCheck/{email}")
+	public ResponseEntity<Object> checkIfEmailExist(@PathVariable String email)
+	{
+		Person personEmailCheck = personRepo.findByEmail(email);
+		if(personEmailCheck != null)
+		{
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Email already exists", "", "FAIL"));
+		}
+		return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Proceed further", "", "OK"));
 	}
 	
 	@GetMapping("/customers")
@@ -127,20 +146,44 @@ public class CustomerController {
 		}
 		else
 			throw new UniquoNotFoundException("Table booking is not successful");
-		
+		logger.info("Booking table successful");
 		return updateCustomer;
 	}
 	
 	@PutMapping("/customer/takeOut/{customerId}")
 	public PersonUser takeOutCustomer(@PathVariable int customerId)
 	{
-		Customer custFetched = customerRepo.updateById(customerId);
-		Optional<Person> personFetched = personRepo.findById(custFetched.getPersonCustomer().getPersonId());
+		int num = customerRepo.updateById(customerId);
 		PersonUser personCust = new PersonUser();
-		personCust.setStatus("OK");
-		personCust.setMessage("Table number for take-out customer is updated");
-		personCust.setTimestamp();
-		personCust.setPerson(personFetched.get());
+		if(num == 1)
+		{
+			Optional<Customer> cust = customerRepo.findById(customerId);
+			Optional<Person> personFetched = personRepo.findById(cust.get().getPersonCustomer().getPersonId());
+			personCust.setStatus("OK");
+			personCust.setMessage("Table number for take-out customer is updated");
+			personCust.setTimestamp();
+			personCust.setPerson(personFetched.get());
+		}
 		return personCust;
+	}
+	
+	@PutMapping("/customer/payment/{orderId}")
+	public ResponseEntity<Object> paymentDone(@PathVariable int orderId)
+	{
+		Optional<OrderFood> orderFood = orderFoodRepo.findById(orderId);
+		OrderFood order_food = orderFood.get();
+		if(order_food !=null)
+		{
+			order_food.setExistingOrder(false);
+		}
+		Optional<TableRestaurant> table = tableRepo.findById(order_food.getTable().getId());
+		if(table.isPresent())
+		{
+			TableRestaurant tableResto = table.get();
+			tableRepo.setCurrentDateTime(tableResto.getId());
+			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Payment Successful", "", "OK"));
+		}
+		else
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Payment not successful", "", "FAIL"));
 	}
 }

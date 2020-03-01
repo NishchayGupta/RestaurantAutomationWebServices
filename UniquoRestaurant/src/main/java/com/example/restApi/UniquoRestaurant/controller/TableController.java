@@ -134,15 +134,22 @@ public class TableController {
 				try {
 					Date endDateTime = sdf.parse(endDate);
 	
-					if (endDateTime.compareTo(todayDate) < 0) { // if end date time is less than
+					if (endDateTime.compareTo(todayDate) < 0) 
+					{ // if end date time is less than
 						logger.info("Inside date less than condition: {}", tableReceived.getId());
 						tableRepo.setCurrentDateTime(tableReceived.getId());
-					} else if (endDateTime.compareTo(todayDate) == 0) { // both date are same
+					} 
+					else if (endDateTime.compareTo(todayDate) == 0) 
+					{ // both date are same
 						logger.info("Inside both date same condition: {}", tableReceived.getId());
-						if (endDateTime.getTime() == todayDate.getTime() || endDateTime.getTime() < todayDate.getTime()) { // expired
+						if (endDateTime.getTime() == todayDate.getTime() 
+								|| endDateTime.getTime() < todayDate.getTime()) 
+						{ // expired
 							tableRepo.setCurrentDateTime(tableReceived.getId());
 						}
-					} else {
+					} 
+					else 
+					{
 						continue;
 					}
 				} catch (ParseException e) {

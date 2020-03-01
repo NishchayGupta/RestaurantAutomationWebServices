@@ -28,11 +28,12 @@ public class OrderFood implements Serializable{
 	
 	private TableRestaurant table;
 	
+	private boolean orderPrepared;
+	
+	private boolean isExistingOrder;
+	
 	@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
 	private Bill bill;
-	
-	//@OneToOne(fetch = FetchType.LAZY, mappedBy = "orderFoodBill", cascade = CascadeType.ALL)
-	//private Bill bill;
 	
 	private List<FoodItemOrder> foodItemOrder;
 	
@@ -43,17 +44,18 @@ public class OrderFood implements Serializable{
 	}
 	
 	public OrderFood(double totalCost, Customer customerOrder, TableRestaurant table,
-			Chef chef, List<FoodItemOrder> foodItemOrder) {
+			Chef chef, List<FoodItemOrder> foodItemOrder, boolean orderPrepared, boolean isExisting) {
 		super();
 		this.totalCost = totalCost;
 		this.customerOrder = customerOrder;
 		this.table = table;
 		this.foodItemOrder = foodItemOrder;
 		this.chef = chef;
+		this.orderPrepared = orderPrepared;
+		this.isExistingOrder = isExisting;
 	}
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public int getId() {
 		return id;
 	}
@@ -83,7 +85,6 @@ public class OrderFood implements Serializable{
 
 	@OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "orderFood_table")
-	@JsonIgnore
 	public TableRestaurant getTable() {
 		return table;
 	}
@@ -113,5 +114,21 @@ public class OrderFood implements Serializable{
 
 	public void setFoodItemOrder(List<FoodItemOrder> foodItemOrder) {
 		this.foodItemOrder = foodItemOrder;
+	}
+
+	public boolean isOrderPrepared() {
+		return orderPrepared;
+	}
+
+	public void setOrderPrepared(boolean orderPrepared) {
+		this.orderPrepared = orderPrepared;
+	}
+
+	public boolean isExistingOrder() {
+		return isExistingOrder;
+	}
+
+	public void setExistingOrder(boolean isExistingOrder) {
+		this.isExistingOrder = isExistingOrder;
 	}
 }

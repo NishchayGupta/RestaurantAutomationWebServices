@@ -30,7 +30,6 @@ public class Customer implements Serializable{
     private List<OrderFood> orderFood;
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "table_customer", unique = false)
-	@JsonIgnore
 	private TableRestaurant tablesRestaurant;
 	
 	public Customer()
