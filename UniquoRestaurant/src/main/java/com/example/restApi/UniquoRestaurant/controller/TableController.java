@@ -29,6 +29,8 @@ import com.example.restApi.UniquoRestaurant.entity.TableRestaurant;
 import com.example.restApi.UniquoRestaurant.exception.EmptyListException;
 import com.example.restApi.UniquoRestaurant.exception.ExceptionResponse;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
+import com.example.restApi.UniquoRestaurant.repository.CustomerRepository;
+import com.example.restApi.UniquoRestaurant.repository.OrderFoodRepository;
 import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 
 /**
@@ -41,6 +43,12 @@ public class TableController {
 	
 	@Autowired
 	private TableRepository tableRepo;
+	
+	@Autowired
+	private CustomerRepository customerRepo;
+	
+	@Autowired
+	private OrderFoodRepository orderFoodRepo;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -137,7 +145,14 @@ public class TableController {
 					if (endDateTime.compareTo(todayDate) < 0) 
 					{ // if end date time is less than
 						logger.info("Inside date less than condition: {}", tableReceived.getId());
+						/*
+						 * int num = orderFoodRepo.setExistingOrderByTable(tableReceived.getId());
+						 * if(num == 1) {
+						 * logger.info("Existing order in table order food is set to zero as the table "
+						 * + "end time has passed the current time"); }
+						 */
 						tableRepo.setCurrentDateTime(tableReceived.getId());
+						//customerRepo.updateByTableId(tableReceived.getId());
 					} 
 					else if (endDateTime.compareTo(todayDate) == 0) 
 					{ // both date are same
@@ -146,6 +161,13 @@ public class TableController {
 								|| endDateTime.getTime() < todayDate.getTime()) 
 						{ // expired
 							tableRepo.setCurrentDateTime(tableReceived.getId());
+							//customerRepo.updateByTableId(tableReceived.getId());
+							/*
+							 * int num = orderFoodRepo.setExistingOrderByTable(tableReceived.getId());
+							 * if(num == 1) {
+							 * logger.info("Existing order in table order food is set to zero as the table "
+							 * + "end time has passed the current time"); }
+							 */
 						}
 					} 
 					else 

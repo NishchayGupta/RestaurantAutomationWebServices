@@ -6,8 +6,6 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -83,7 +81,7 @@ public class OrderFood implements Serializable{
 		this.customerOrder = customerOrder;
 	}
 
-	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "orderFood_table")
 	public TableRestaurant getTable() {
 		return table;
@@ -107,7 +105,6 @@ public class OrderFood implements Serializable{
 	}
 
 	@OneToMany(mappedBy = "orderFood", cascade = CascadeType.ALL)
-	@JsonIgnore
 	public List<FoodItemOrder> getFoodItemOrder() {
 		return foodItemOrder;
 	}

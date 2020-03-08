@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.restApi.UniquoRestaurant.dao.PersonUser;
 import com.example.restApi.UniquoRestaurant.entity.Manager;
 import com.example.restApi.UniquoRestaurant.entity.Person;
+import com.example.restApi.UniquoRestaurant.repository.FoodItemRepository;
 import com.example.restApi.UniquoRestaurant.repository.ManagerRepository;
 import com.example.restApi.UniquoRestaurant.repository.PersonRepository;
 
@@ -25,6 +26,8 @@ public class ManagerController {
 	
 	@Autowired
 	private ManagerRepository managerRepo;
+	
+	private FoodItemRepository foodItemRepo;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -52,4 +55,5 @@ public class ManagerController {
 		
 		return personManager;
 	}
+	
 }

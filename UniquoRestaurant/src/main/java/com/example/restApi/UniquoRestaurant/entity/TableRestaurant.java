@@ -6,7 +6,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,7 +23,9 @@ public class TableRestaurant implements Serializable{
 	private Date endDateTime;
 	private int waitingTime;
 	
-	private OrderFood orderFood;
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "table", cascade = CascadeType.ALL)
+	@JsonIgnore
+	private List<OrderFood> orderFood;
 	
 	public TableRestaurant()
 	{
@@ -70,13 +72,12 @@ public class TableRestaurant implements Serializable{
 		this.endDateTime = endDateTime;
 	}
 
-	@OneToOne(fetch = FetchType.LAZY, mappedBy = "table", cascade = CascadeType.ALL)
-	@JsonIgnore
-	public OrderFood getOrderFood() {
+	
+	public List<OrderFood> getOrderFood() {
 		return orderFood;
 	}
 
-	public void setOrderFood(OrderFood orderFood) {
+	public void setOrderFood(List<OrderFood> orderFood) {
 		this.orderFood = orderFood;
 	}
 

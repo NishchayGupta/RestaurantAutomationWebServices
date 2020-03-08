@@ -175,12 +175,16 @@ public class CustomerController {
 		if(order_food !=null)
 		{
 			order_food.setExistingOrder(false);
+			order_food.setOrderPrepared(false);
+			orderFoodRepo.save(order_food);
 		}
 		Optional<TableRestaurant> table = tableRepo.findById(order_food.getTable().getId());
 		if(table.isPresent())
 		{
 			TableRestaurant tableResto = table.get();
 			tableRepo.setCurrentDateTime(tableResto.getId());
+			customerRepo.updateByTableId(tableResto.getId());
+			orderFoodRepo.setExistingOrder(orderId);
 			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Payment Successful", "", "OK"));
 		}
 		else

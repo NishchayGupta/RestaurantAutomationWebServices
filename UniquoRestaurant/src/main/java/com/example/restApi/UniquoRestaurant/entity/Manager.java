@@ -24,7 +24,6 @@ public class Manager implements Serializable{
 	@JsonIgnore
 	private Person personManager;
 	
-	
 	public Manager()
 	{
 	}

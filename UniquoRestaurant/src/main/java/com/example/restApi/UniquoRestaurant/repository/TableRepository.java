@@ -26,13 +26,13 @@ public interface TableRepository extends JpaRepository<TableRestaurant, Integer>
 	int updateWaitingTime();
 	
 	@Query(value = "SELECT id, booking_date_time, end_date_time, start_date_time, \n" + 
-			"            waiting_time, order_food \n" + 
+			"            waiting_time\n" + 
 			"            from table_restaurant \n" + 
 			"            where id != 11 AND id != 12 AND id NOT IN (Select table_customer from customer)\n" + 
 			"            order by waiting_time limit 1;", nativeQuery = true)
 	TableRestaurant checkTableAvailability();
 	
-	@Query(value = "SELECT id, booking_date_time, end_date_time, start_date_time, order_food,"
+	@Query(value = "SELECT id, booking_date_time, end_date_time, start_date_time,"
 			+ "ABS(TIMESTAMPDIFF(MINUTE, NOW(), end_date_time)) waiting_time "
 			+ "from table_restaurant where id != 11 AND id != 12 AND id NOT IN (Select table_customer from customer)"
 			+ "order by waiting_time", nativeQuery = true)

@@ -1,8 +1,9 @@
 package com.example.restApi.UniquoRestaurant.controller;
 
-import java.net.URI;
+import java.sql.Timestamp;
 import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.restApi.UniquoRestaurant.entity.FoodItem;
 import com.example.restApi.UniquoRestaurant.exception.EmptyListException;
+import com.example.restApi.UniquoRestaurant.exception.ExceptionResponse;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.FoodItemRepository;
 
@@ -53,28 +54,33 @@ public class FoodItemController {
 	public ResponseEntity<Object> createFoodItem(@RequestBody FoodItem foodItem)
 	{
 		FoodItem foodItemSaved = foodItemRepo.save(foodItem);
-		URI location = ServletUriComponentsBuilder
-		.fromCurrentRequest()
-		.path("/id")
-		.buildAndExpand(foodItemSaved.getId())
-		.toUri();
-		
-		return ResponseEntity.created(location).build();
+		if(foodItemSaved != null)
+		{
+			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Added Successfully", "", "OK"));
+		}
+		else
+		{
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Not Added Successfully", "", "FAIL"));
+		}
 	}
 	
 	@DeleteMapping("/foodItem/{foodItemId}")
-	public void removeFoodItem(@PathVariable int foodItemId)
+	public ResponseEntity<Object> removeFoodItem(@PathVariable int foodItemId)
 	{
 		Optional<FoodItem> foodItemById = foodItemRepo.findById(foodItemId);
 		if(!foodItemById.isPresent())
 		{
-			throw new UniquoNotFoundException("id: " +foodItemId);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Not Deleted Successfully", "", "FAIL"));
 		}
-		foodItemRepo.deleteById(foodItemId);
+		else
+		{
+			foodItemRepo.deleteById(foodItemId);
+			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Deleted Successfully", "", "OK"));
+		}
 	}
 	
 	@PutMapping("/foodItem/{id}")
-	public FoodItem updateFoodItem(@PathVariable int id, @RequestBody FoodItem foodItem)
+	public ResponseEntity<Object> updateFoodItem(@PathVariable int id, @RequestBody FoodItem foodItem)
 	{
 		Optional<FoodItem> foodItemFetched = foodItemRepo.findById(id);
 		FoodItem updateFoodItem = foodItemFetched.get();
@@ -83,11 +89,16 @@ public class FoodItemController {
 			updateFoodItem.setFoodItemName(foodItem.getFoodItemName());
 			updateFoodItem.setFoodItemPicture(foodItem.getFoodItemPicture());
 			updateFoodItem.setFoodItemPrice(foodItem.getFoodItemPrice());
-			foodItemRepo.save(updateFoodItem);
+			if(foodItemRepo.save(updateFoodItem) != null)
+			{
+				return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Updated Successfully", "", "OK"));
+			}
+			else
+			{
+				throw new UniquoNotFoundException("id: " + id);
+			}
 		}
 		else
-			throw new UniquoNotFoundException("id: " +id);
-		
-		return updateFoodItem;
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Food Item Not Updated Successfully", "", "FAIL"));
 	}
 }

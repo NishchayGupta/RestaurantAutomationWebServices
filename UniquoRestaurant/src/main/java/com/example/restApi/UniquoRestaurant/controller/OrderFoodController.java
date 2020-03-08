@@ -107,6 +107,20 @@ public class OrderFoodController {
 		return orderFoodFound;
 	}
 	
+	// For Past orders 
+	@GetMapping("/order/customer/allOrders/{customerId}")
+	public List<OrderFood> getAllOrdersFromCustomerId(@PathVariable int customerId)
+	{
+		logger.info("Inside getAllOrderFromCustomerId");
+		List<OrderFood> orderFoodFound = orderFoodRepo.findByCustomerIdAllOrders(customerId);
+		logger.info("After getAllOrderFromCustomerId");
+		if(orderFoodFound == null)
+		{
+			throw new UniquoNotFoundException("Order doesn't exist for the customer: " +customerId);
+		}
+		return orderFoodFound;
+	}
+	
 	@PostMapping("/order")
 	public ResponseEntity<Object> createOrder(@RequestBody OrderFood orderFood)
 	{
@@ -163,13 +177,23 @@ public class OrderFoodController {
 		logger.info("Customer is fetched from the customer id given in the request");
 		
 		// Table to be fetched and set
-		Optional<TableRestaurant> table = tableRepo.findById(custOrd.getTableId());
-		TableRestaurant tableFetched = table.get();
-		if(!table.isPresent())
+		TableRestaurant tableFetched = null;
+		if(custOrd.getTableId() == customerFetched.getTablesRestaurant().getId())
 		{
-			throw new UniquoNotFoundException("id: " + custOrd.getTableId());
+			Optional<TableRestaurant> table = tableRepo.findById(custOrd.getTableId());
+			tableFetched = table.get();
+			if(!table.isPresent())
+			{
+				throw new UniquoNotFoundException("id: " + custOrd.getTableId());
+			}
+			logger.info("Table is fetched from the table id given in the request");
+			logger.info("TableIdRequest: {}, TableIdCustomer: {}", custOrd.getTableId(), customerFetched.getTablesRestaurant().getId());
 		}
-		logger.info("Table is fetched from the table id given in the request");
+		else
+		{
+			logger.info("The table id sent in the request and the table id assigned in "
+					+ "to the customer doesn't match. TableIdRequest: {}, TableIdCustomer: {}", custOrd.getTableId(), customerFetched.getTablesRestaurant().getId());
+		}
 		
 		// Chef to be fetched and set
 		List<Chef> chefList = chefRepo.findAll();

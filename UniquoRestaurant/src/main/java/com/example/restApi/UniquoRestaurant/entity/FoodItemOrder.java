@@ -8,12 +8,15 @@ import javax.persistence.IdClass;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @IdClass(FoodItemOrderId.class)
 public class FoodItemOrder implements Serializable{
 	@Id
     @ManyToOne
     @JoinColumn(name = "orderFood_id", referencedColumnName = "id")
+	@JsonIgnore
     private OrderFood orderFood;
 
     @Id

@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.restApi.UniquoRestaurant.dao.PersonUser;
 import com.example.restApi.UniquoRestaurant.entity.Cashier;
+import com.example.restApi.UniquoRestaurant.entity.OrderFood;
 import com.example.restApi.UniquoRestaurant.entity.Person;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.CashierRepository;
+import com.example.restApi.UniquoRestaurant.repository.OrderFoodRepository;
 import com.example.restApi.UniquoRestaurant.repository.PersonRepository;
 
 @RestController
@@ -28,6 +30,9 @@ public class CashierController {
 	
 	@Autowired
 	private CashierRepository cashierRepo;
+	
+	@Autowired
+	private OrderFoodRepository orderFoodRepo;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -66,5 +71,19 @@ public class CashierController {
 			throw new UniquoNotFoundException("There is no cashier registered.");
 		}
 		return cashierFound;
+	}
+	
+	@GetMapping("/cashier/allExistingOrders")
+	public List<OrderFood> getAllExistingOrders()
+	{
+		List<OrderFood> orderFood = orderFoodRepo.findAllOrders();
+		if(orderFood == null)
+		{
+			throw new UniquoNotFoundException("There are no live orders present.");
+		}
+		else
+		{
+			return orderFood;
+		}
 	}
 }

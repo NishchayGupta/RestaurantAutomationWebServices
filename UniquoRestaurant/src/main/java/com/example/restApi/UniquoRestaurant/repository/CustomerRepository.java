@@ -18,4 +18,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer>{
 	@Query(value = "UPDATE customer SET table_customer = 11, order_type = 'Takeout'\n" + 
 			"where id=?1", nativeQuery = true)
 	int updateById(int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE customer SET table_customer = 12, order_type = 'Registered'\n" + 
+			"where table_customer=?1", nativeQuery = true)
+	void updateByTableId(int tableId);
 }

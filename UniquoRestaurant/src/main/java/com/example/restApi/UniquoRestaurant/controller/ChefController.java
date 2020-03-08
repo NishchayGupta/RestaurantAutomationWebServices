@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.restApi.UniquoRestaurant.dao.PersonUser;
 import com.example.restApi.UniquoRestaurant.entity.Chef;
+import com.example.restApi.UniquoRestaurant.entity.OrderFood;
 import com.example.restApi.UniquoRestaurant.entity.Person;
 import com.example.restApi.UniquoRestaurant.entity.TableRestaurant;
 import com.example.restApi.UniquoRestaurant.exception.UniquoNotFoundException;
 import com.example.restApi.UniquoRestaurant.repository.ChefRepository;
+import com.example.restApi.UniquoRestaurant.repository.OrderFoodRepository;
 import com.example.restApi.UniquoRestaurant.repository.PersonRepository;
 import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 
@@ -36,6 +38,9 @@ public class ChefController {
 	
 	@Autowired
 	private TableRepository tableRepo;
+	
+	@Autowired
+	private OrderFoodRepository orderFoodRepo;
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -83,10 +88,24 @@ public class ChefController {
 		if(!tableResto.equals(null))
 		{
 			tableRepo.setDateTimeOrderPrepared(tableId);
+			OrderFood orderFood = orderFoodRepo.findByOrderFoodTable(tableId);
+			orderFood.setOrderPrepared(true);
+			orderFoodRepo.save(orderFood);
 		}
 		else
 			throw new UniquoNotFoundException("Table id: " + tableId + " not found.");
 		logger.info("Table start time and end time is set when order is prepared by chef");
 		return tableResto;
+	}
+	
+	@GetMapping("/chef/existingOrders")
+	public List<OrderFood> getListOfExistingOrders()
+	{
+		List<OrderFood> orderFood = orderFoodRepo.findAllExistingOrders();
+		if(orderFood == null)
+		{
+			throw new UniquoNotFoundException("There are no new orders");
+		}
+		return orderFood;
 	}
 }
