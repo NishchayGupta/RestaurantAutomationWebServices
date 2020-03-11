@@ -111,7 +111,7 @@ public class OrderFoodController {
 	@GetMapping("/order/customer/allOrders/{customerId}")
 	public List<OrderFood> getAllOrdersFromCustomerId(@PathVariable int customerId)
 	{
-		logger.info("Inside getAllOrderFromCustomerId");
+		logger.info("Inside getAllOrderFromCustomerId: customerId: {}", customerId);
 		List<OrderFood> orderFoodFound = orderFoodRepo.findByCustomerIdAllOrders(customerId);
 		logger.info("After getAllOrderFromCustomerId");
 		if(orderFoodFound == null)
