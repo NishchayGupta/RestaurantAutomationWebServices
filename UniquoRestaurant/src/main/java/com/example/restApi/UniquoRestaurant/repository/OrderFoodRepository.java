@@ -15,7 +15,7 @@ public interface OrderFoodRepository extends JpaRepository<OrderFood, Integer>{
 	@Query(value = "select * from order_food where customer_id = ?1 AND existing_order = 1", nativeQuery = true)
 	OrderFood findByCustomerId(int customerId);
 	
-	@Query(value = "select * from order_food where customer_id = ?1", nativeQuery = true)
+	@Query(value = "select * from order_food where customer_id = ?1 order by existing_order", nativeQuery = true)
 	List<OrderFood> findByCustomerIdAllOrders(int customerId);
 	
 	@Transactional

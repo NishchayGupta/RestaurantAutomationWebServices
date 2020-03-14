@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
 import org.slf4j.Logger;
@@ -129,6 +130,7 @@ public class TableController {
 		List<TableRestaurant> allTablesUpdate = tableRepo.findAll();
 		for (TableRestaurant tableReceived : allTablesUpdate) {
 			logger.info("tableIdOutdsideIf: {}", tableReceived.getId());
+			logger.info("tableReceived End date time: {}", tableReceived.getEndDateTime().toString());
 			if(tableReceived.getId() == 11 || tableReceived.getId() == 12)
 			{
 				continue;
@@ -138,36 +140,30 @@ public class TableController {
 				logger.info("tableIdInsideElse: {}", tableReceived.getId());
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 				String endDate = sdf.format(tableReceived.getEndDateTime());
-				Date todayDate = new Date();
+				Date todayD = new Date();
+				Calendar todayDate = Calendar.getInstance();
+				Calendar endDateTime = Calendar.getInstance();
+				todayDate.setTime(todayD);
+				todayDate.add(Calendar.HOUR_OF_DAY, 1);
+				logger.info("Todays date is considered");
 				try {
-					Date endDateTime = sdf.parse(endDate);
-	
+					Date endDateT = sdf.parse(endDate);
+					endDateTime.setTime(endDateT);
+					logger.info("Inside try");
+					logger.info("endDateTime: {}", endDateTime.getTime());
+					logger.info("todayDate: {}", todayDate.getTime());
 					if (endDateTime.compareTo(todayDate) < 0) 
 					{ // if end date time is less than
 						logger.info("Inside date less than condition: {}", tableReceived.getId());
-						/*
-						 * int num = orderFoodRepo.setExistingOrderByTable(tableReceived.getId());
-						 * if(num == 1) {
-						 * logger.info("Existing order in table order food is set to zero as the table "
-						 * + "end time has passed the current time"); }
-						 */
 						tableRepo.setCurrentDateTime(tableReceived.getId());
-						//customerRepo.updateByTableId(tableReceived.getId());
 					} 
 					else if (endDateTime.compareTo(todayDate) == 0) 
 					{ // both date are same
 						logger.info("Inside both date same condition: {}", tableReceived.getId());
 						if (endDateTime.getTime() == todayDate.getTime() 
-								|| endDateTime.getTime() < todayDate.getTime()) 
+								|| endDateTime.getTime().before(todayDate.getTime())) 
 						{ // expired
 							tableRepo.setCurrentDateTime(tableReceived.getId());
-							//customerRepo.updateByTableId(tableReceived.getId());
-							/*
-							 * int num = orderFoodRepo.setExistingOrderByTable(tableReceived.getId());
-							 * if(num == 1) {
-							 * logger.info("Existing order in table order food is set to zero as the table "
-							 * + "end time has passed the current time"); }
-							 */
 						}
 					} 
 					else 
@@ -201,11 +197,9 @@ public class TableController {
 	public WaitingTime getAvailability() throws ParseException
 	{
 
-			//tableRepo.save(tableRepo.checkTableAvailability());
 			TableRestaurant availableTime = tableRepo.checkTableAvailability();
 			
 			logger.info("waiting time ---> {}", availableTime.getWaitingTime());
-			//tableRepo.save(availableTime);
 			if(availableTime.equals(null))
 			{
 				throw new UniquoNotFoundException("The waiting time cannot be calculated");

@@ -65,7 +65,6 @@ public class CustomerController {
 		Optional<Person> person_Cust = personRepo.findById(cust.getPersonCustomer().getPersonId());
 		Person personNew = person_Cust.get();
 		PersonUser personCust = new PersonUser();
-		//tableRepo.save(tableRest.get());
 		if(cust.equals(null))
 		{	
 			personCust.setStatus("FAIL");
@@ -181,10 +180,13 @@ public class CustomerController {
 		Optional<TableRestaurant> table = tableRepo.findById(order_food.getTable().getId());
 		if(table.isPresent())
 		{
+			logger.info("Table number is found hence the start and end date time will be set");
 			TableRestaurant tableResto = table.get();
-			tableRepo.setCurrentDateTime(tableResto.getId());
+			logger.info("table id found during payment: {}", tableResto.getId());
 			customerRepo.updateByTableId(tableResto.getId());
+			tableRepo.setCurrentDateTime(tableResto.getId());			
 			orderFoodRepo.setExistingOrder(orderId);
+			logger.info("Payment is done successfully");
 			return ResponseEntity.status(HttpStatus.OK).body(new ExceptionResponse(new Timestamp(System.currentTimeMillis()), "Payment Successful", "", "OK"));
 		}
 		else

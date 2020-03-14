@@ -44,7 +44,7 @@ import com.example.restApi.UniquoRestaurant.repository.TableRepository;
 @RequestMapping("/uniquo")
 public class OrderFoodController {
 	
-	public static final int ID_LENGTH = 3;
+	public static final int ID_LENGTH = 4;
 	
 	@Autowired
 	private OrderFoodRepository orderFoodRepo;
@@ -152,7 +152,6 @@ public class OrderFoodController {
 		OrderFood updateOrderFood = orderFoodFetched.get();
 		if(orderFoodFetched.isPresent())
 		{
-			//updateOrderFood.setOrderType(orderFood.getOrderType());
 			updateOrderFood.setTotalCost(orderFood.getTotalCost());
 			orderFoodRepo.save(updateOrderFood);
 		}
